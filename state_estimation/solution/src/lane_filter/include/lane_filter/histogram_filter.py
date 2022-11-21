@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[80]:
 
 
 # start by importing some things we will need
@@ -13,7 +13,7 @@ from scipy.stats import entropy, multivariate_normal
 from math import floor, sqrt
 
 
-# In[ ]:
+# In[83]:
 
 
 # Now let's define the prior function. In this case we choose
@@ -27,58 +27,105 @@ def histogram_prior(belief, grid_spec, mean_0, cov_0):
     return belief
 
 
-# In[ ]:
+# In[84]:
 
 
 # Now let's define the predict function
 
 
 def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_spec, robot_spec, cov_mask):
+        
         belief_in = belief
         delta_t = dt
         
         # TODO calculate v and w from ticks using kinematics. You will need  some parameters in the `robot_spec` defined above
-        v = 0.0 # replace this with a function that uses the encoder 
-        w = 0.0 # replace this with a function that uses the encoder
         
-        # TODO propagate each centroid forward using the kinematic function
-        d_t = grid_spec['d'] # replace this with something that adds the new odometry
-        phi_t = grid_spec['phi'] # replace this with something that adds the new odometry
+        #-------
+        
+        #encoder_est = robot_spec['encoder_resolution']/(2 * np.pi * robot_spec['wheel_radius'])
+        
+        #l_d = left_encoder_ticks /  encoder_est
+        #r_d = right_encoder_ticks / encoder_est
 
-        p_belief = np.zeros(belief.shape)
+        #delta_x = (r_d + l_d) / 2
+        #delta_theta = (r_d - l_d) / robot_spec['wheel_baseline']
+
+        #v = delta_x / delta_t # replace this with a function that uses the encoder 
+        #w = delta_theta / delta_t # replace this with a function that uses the encoder
+        
+        ##------
+    
+        alpha = 2*np.pi/robot_spec['encoder_resolution'] # rotation per tick in radians 
+
+        #delta_phi = alpha*delta_ticks # in radians
+        
+        #delta_ticks_left = ticks_left - prev_tick_left # delta ticks of left wheel 
+        #delta_ticks_right = ticks_right - prev_tick_right # delta ticks of right wheel 
+
+        rotation_wheel_left = alpha * left_encoder_ticks # total rotation of left wheel 
+        rotation_wheel_right = alpha * right_encoder_ticks # total rotation of right wheel
+                
+        # How much would the wheels rotate with the above tick measurements?      
+        d_left = robot_spec['wheel_radius'] * rotation_wheel_left 
+        d_right = robot_spec['wheel_radius'] * rotation_wheel_right
+        
+        #d_A = (d_left + d_right)/2  # How much has the robot travelled?
+        
+        #delta_x = (r_d + l_d) / 2 # How much has the robot travelled?
+        #delta_theta = (r_d - l_d) / robot_spec['wheel_baseline'] # How much has the robot rotated? # expressed in radians
+
+        delta_x = (d_right + d_left) / 2 # How much has the robot travelled?
+        delta_theta = (d_right - d_left) / robot_spec['wheel_baseline'] # How much has the robot rotated? # expressed in radians
+  
+        v = delta_x / delta_t # replace this with a function that uses the encoder 
+        w = delta_theta / delta_t # replace this with a function that uses the encoder
+        
+        #--------
+        
+        dt = grid_spec['d'] + v * delta_t * np.sin(grid_spec['phi'])  # replace this with something that adds the new odometry
+        phi_t = grid_spec['phi'] + w * delta_t # replace this with something that adds the new odometry
+
+        p_belief = np.zeros(belief_in.shape)
 
         # Accumulate the mass for each cell as a result of the propagation step
-        for i in range(belief.shape[0]):
-            for j in range(belief.shape[1]):
+        
+        # TODO propagate each centroid forward using the kinematic function
+        
+        for i in range(belief_in.shape[0]):
+            for j in range(belief_in.shape[1]):
                 # If belief[i,j] there was no mass to move in the first place
-                if belief[i, j] > 0:
+                if belief_in[i, j] > 0:
                     # Now check that the centroid of the cell wasn't propagated out of the allowable range
                     if (
-                        d_t[i, j] > grid_spec['d_max']
-                        or d_t[i, j] < grid_spec['d_min']
+                        dt[i, j] > grid_spec['d_max']
+                        or dt[i, j] < grid_spec['d_min']
                         or phi_t[i, j] < grid_spec['phi_min']
                         or phi_t[i, j] > grid_spec['phi_max']
                     ):
                         continue
                     
                     # TODO Now find the cell where the new mass should be added
-                    i_new = i # replace with something that accounts for the movement of the robot
-                    j_new = j # replace with something that accounts for the movement of the robot
+                    #i_new = i # replace with something that accounts for the movement of the robot
+                    i_new = int(floor((dt[i, j] - grid_spec['d_min']) / grid_spec['delta_d']))
+                    
+                    #j_new = j # replace with something that accounts for the movement of the robot
+                    j_new = int(floor((phi_t[i, j] - grid_spec['phi_min']) / grid_spec['delta_phi']))
 
-                    p_belief[i_new, j_new] += belief[i, j]
+                    p_belief[i_new, j_new] += belief_in[i, j]
 
         # Finally we are going to add some "noise" according to the process model noise
         # This is implemented as a Gaussian blur
-        s_belief = np.zeros(belief.shape)
+        s_belief = np.zeros(belief_in.shape)
         gaussian_filter(p_belief, cov_mask, output=s_belief, mode="constant")
 
         if np.sum(s_belief) == 0:
             return belief_in
-        belief = s_belief / np.sum(s_belief)
-        return belief
+        
+        belief_in = s_belief / np.sum(s_belief)
+        return belief_in
 
 
-# In[ ]:
+# In[85]:
 
 
 # We will start by doing a little bit of processing on the segments to remove anything that is behing the robot (why would it be behind?)
@@ -99,7 +146,7 @@ def prepare_segments(segments):
     return filtered_segments
 
 
-# In[ ]:
+# In[86]:
 
 
 def generate_vote(segment, road_spec):
@@ -139,7 +186,7 @@ def generate_vote(segment, road_spec):
     return d_i, phi_i
 
 
-# In[ ]:
+# In[87]:
 
 
 def generate_measurement_likelihood(segments, road_spec, grid_spec):
@@ -155,8 +202,11 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
             continue
 
         # TODO find the cell index that corresponds to the measurement d_i, phi_i
-        i = 1 # replace this
-        j = 1 # replace this
+        #i = 1 # replace this
+        i = int(floor((d_i - grid_spec['d_min']) / grid_spec['delta_d']))
+        
+        #j = 1 # replace this
+        j = int(floor((phi_i - grid_spec['phi_min']) / grid_spec['delta_phi']))
         
         # Add one vote to that cell
         measurement_likelihood[i, j] += 1
@@ -167,7 +217,7 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
     return measurement_likelihood
 
 
-# In[ ]:
+# In[88]:
 
 
 def histogram_update(belief, segments, road_spec, grid_spec):
@@ -180,6 +230,12 @@ def histogram_update(belief, segments, road_spec, grid_spec):
     if measurement_likelihood is not None:
         # TODO: combine the prior belief and the measurement likelihood to get the posterior belief
         # Don't forget that you may need to normalize to ensure that the output is valid probability distribution
-        belief = measurement_likelihood # replace this with something that combines the belief and the measurement_likelihood
+        
+        belief = np.multiply(belief, measurement_likelihood) # replace this with something that combines the belief and the measurement_likelihood            
+        if np.sum(belief) == 0:
+            belief = measurement_likelihood
+        else:    
+            belief = belief / np.sum(belief)
+                             
     return (measurement_likelihood, belief)
 
