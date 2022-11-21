@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[80]:
+# In[1]:
 
 
 # start by importing some things we will need
@@ -13,7 +13,7 @@ from scipy.stats import entropy, multivariate_normal
 from math import floor, sqrt
 
 
-# In[83]:
+# In[4]:
 
 
 # Now let's define the prior function. In this case we choose
@@ -27,7 +27,7 @@ def histogram_prior(belief, grid_spec, mean_0, cov_0):
     return belief
 
 
-# In[84]:
+# In[5]:
 
 
 # Now let's define the predict function
@@ -82,19 +82,20 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
         
         #--------
         
-        dt = grid_spec['d'] + v * delta_t * np.sin(grid_spec['phi'])  # replace this with something that adds the new odometry
+        #dt = grid_spec['d'] + v * delta_t * np.sin(grid_spec['phi'])  # replace this with something that adds the new odometry
         phi_t = grid_spec['phi'] + w * delta_t # replace this with something that adds the new odometry
+        dt = grid_spec['d'] + v * delta_t * np.sin(phi_t)
 
-        p_belief = np.zeros(belief_in.shape)
+        p_belief = np.zeros(belief.shape)
 
         # Accumulate the mass for each cell as a result of the propagation step
         
         # TODO propagate each centroid forward using the kinematic function
         
-        for i in range(belief_in.shape[0]):
-            for j in range(belief_in.shape[1]):
+        for i in range(belief.shape[0]):
+            for j in range(belief.shape[1]):
                 # If belief[i,j] there was no mass to move in the first place
-                if belief_in[i, j] > 0:
+                if belief[i, j] > 0:
                     # Now check that the centroid of the cell wasn't propagated out of the allowable range
                     if (
                         dt[i, j] > grid_spec['d_max']
@@ -111,21 +112,21 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
                     #j_new = j # replace with something that accounts for the movement of the robot
                     j_new = int(floor((phi_t[i, j] - grid_spec['phi_min']) / grid_spec['delta_phi']))
 
-                    p_belief[i_new, j_new] += belief_in[i, j]
+                    p_belief[i_new, j_new] += belief[i, j]
 
         # Finally we are going to add some "noise" according to the process model noise
         # This is implemented as a Gaussian blur
-        s_belief = np.zeros(belief_in.shape)
+        s_belief = np.zeros(belief.shape)
         gaussian_filter(p_belief, cov_mask, output=s_belief, mode="constant")
 
         if np.sum(s_belief) == 0:
             return belief_in
         
-        belief_in = s_belief / np.sum(s_belief)
-        return belief_in
+        belief = s_belief / np.sum(s_belief)
+        return belief
 
 
-# In[85]:
+# In[6]:
 
 
 # We will start by doing a little bit of processing on the segments to remove anything that is behing the robot (why would it be behind?)
@@ -146,7 +147,7 @@ def prepare_segments(segments):
     return filtered_segments
 
 
-# In[86]:
+# In[7]:
 
 
 def generate_vote(segment, road_spec):
@@ -186,7 +187,7 @@ def generate_vote(segment, road_spec):
     return d_i, phi_i
 
 
-# In[87]:
+# In[8]:
 
 
 def generate_measurement_likelihood(segments, road_spec, grid_spec):
@@ -217,7 +218,7 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
     return measurement_likelihood
 
 
-# In[88]:
+# In[9]:
 
 
 def histogram_update(belief, segments, road_spec, grid_spec):
