@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 solution/.catkin_tools/
 solution/build/
 solution/devel/
 solution/logs/
+=======
+>>>>>>> upstream/daffy
 __pycache__/
 *.pyc
 catkin_ws/logs/
@@ -19,3 +22,7 @@ catkin_ws/.catkin_tools/
 .ipynb_checkpoints
 *-filtered*
 
+<<<<<<< HEAD
+=======
+FROZEN
+>>>>>>> upstream/daffy

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 - [Exercise: Write a path planner](#exercise--write-a-path-planner)
   * [Path planning problems](#path-planning-problems)
     + [No obstacles](#no-obstacles)
@@ -78,11 +79,22 @@ The combinations give rise to 6 challenges, summarized in the following table.
 ### Dynamic obstacles
 
 <img src="_media/dd-dynamic.gif"/>
+=======
+# Write a path planner
+
+In this exercise, you will write a path planner. You will need to have solved the `collision` part already because you will use your collision checker (you probably want to copy it into your solution folder).
+
+Note: This is a code-only exercise: you don't need the Duckiebot.
+
+>>>>>>> upstream/daffy
 
 ## Instructions
 
 The template contained in the `planner` subfolder is a fully functional (but wrong) solution.
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/daffy
 You can try to evaluate/submit it right away.
 
 Make sure you have an updated system using
@@ -91,7 +103,11 @@ Make sure you have an updated system using
 dts desktop update
 ```
 
+<<<<<<< HEAD
 To evaluate the submission, go in `planner/` and use:
+=======
+To evaluate the submission use (change the corresponing challenge if needed):
+>>>>>>> upstream/daffy
 
 ```shell
 dts challenges evaluate --challenge mooc-planning-dd-static-vali
@@ -103,13 +119,18 @@ To submit, use
 dts challenges submit
 ```
 
+<<<<<<< HEAD
 This will send it to all the challenges listed in the `submission.yaml` file (all of the above).
+=======
+This will send it to all the challenges listed in the `submission.yaml` file.
+>>>>>>> upstream/daffy
 
 To minimize confusion, you might want to submit to one challenge at a time with the `--challenge` option.
 
 
 ### Passing criteria
 
+<<<<<<< HEAD
 Note that for the Spring 2021 MOOC this is not a graded exercise.
 
 To pass, you have to get at least 95% of the queries correct on the `*-test` challenges.
@@ -369,3 +390,8 @@ When inside the Jupyter notebook, navigate to the `duckietown-world/notebooks` d
 There are a few notebooks. The most relevant for you is `20-graphs-with-networkx.pynb`.
 
 <img src="_media/notebook.png" style="width: 30%">
+=======
+
+To pass, you have to get at least 95% of the queries correct on the `*-test` challenges.
+(This allows some slack, so that you can experiment with probabilistic algorithms).
+>>>>>>> upstream/daffy

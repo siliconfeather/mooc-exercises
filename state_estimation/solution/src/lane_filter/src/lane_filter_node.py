@@ -54,8 +54,11 @@ class LaneFilterNode(DTROS):
 
         # Create the filter
         self.filter = LaneFilterHistogram(**self._filter)
+<<<<<<< HEAD
         self.t_last_update = rospy.get_time()
         self.last_update_stamp = rospy.Time.now()
+=======
+>>>>>>> upstream/daffy
 
         # Subscribers
         self.sub_segment_list = rospy.Subscriber(
@@ -87,6 +90,11 @@ class LaneFilterNode(DTROS):
         self.left_encoder_ticks = 0
         self.right_encoder_ticks_delta = 0
         self.left_encoder_ticks_delta = 0
+<<<<<<< HEAD
+=======
+        self.last_encoder_stamp = None
+        
+>>>>>>> upstream/daffy
         # Set up a timer for prediction (if we got encoder data) since that data can come very quickly
         rospy.Timer(rospy.Duration(1 / self._predict_freq), self.cbPredict)
 
@@ -101,29 +109,48 @@ class LaneFilterNode(DTROS):
             self.filter.encoder_resolution = left_encoder_msg.resolution
             self.filter.initialized = True
         self.left_encoder_ticks_delta = left_encoder_msg.data - self.left_encoder_ticks
+<<<<<<< HEAD
+=======
+        self.last_encoder_stamp = left_encoder_msg.header.stamp
+>>>>>>> upstream/daffy
 
     def cbProcessRightEncoder(self, right_encoder_msg):
         if not self.filter.initialized:
             self.filter.encoder_resolution = right_encoder_msg.resolution
             self.filter.initialized = True
         self.right_encoder_ticks_delta = right_encoder_msg.data - self.right_encoder_ticks
+<<<<<<< HEAD
 
     def cbPredict(self, event):
         current_time = rospy.get_time()
         dt = current_time - self.t_last_update
         self.t_last_update = current_time
 
+=======
+        self.last_encoder_stamp = right_encoder_msg.header.stamp
+        
+
+    def cbPredict(self, event):
+>>>>>>> upstream/daffy
         # first let's check if we moved at all, if not abort
         if self.right_encoder_ticks_delta == 0 and self.left_encoder_ticks_delta == 0:
             return
 
+<<<<<<< HEAD
         self.filter.predict(dt, self.left_encoder_ticks_delta, self.right_encoder_ticks_delta)
+=======
+        self.filter.predict(self.left_encoder_ticks_delta, self.right_encoder_ticks_delta)
+>>>>>>> upstream/daffy
         self.left_encoder_ticks += self.left_encoder_ticks_delta
         self.right_encoder_ticks += self.right_encoder_ticks_delta
         self.left_encoder_ticks_delta = 0
         self.right_encoder_ticks_delta = 0
 
+<<<<<<< HEAD
         self.publishEstimate(self.last_update_stamp)
+=======
+        self.publishEstimate(self.last_encoder_stamp)
+>>>>>>> upstream/daffy
 
     def cbProcessSegments(self, segment_list_msg):
         """Callback to process the segments
@@ -132,6 +159,7 @@ class LaneFilterNode(DTROS):
             segment_list_msg (:obj:`SegmentList`): message containing list of processed segments
 
         """
+<<<<<<< HEAD
 
         self.last_update_stamp = segment_list_msg.header.stamp
 
@@ -152,6 +180,21 @@ class LaneFilterNode(DTROS):
         # build lane pose message to send
         lanePose = LanePose()
         lanePose.header.stamp = timestamp
+=======
+        # update
+        self.filter.update(segment_list_msg.segments)
+
+        # publish
+        self.publishEstimate(segment_list_msg.header.stamp)
+
+    def publishEstimate(self, stamp):
+
+        [d_max, phi_max] = self.filter.getEstimate()
+
+        # build lane pose message to send
+        lanePose = LanePose()
+        lanePose.header.stamp = stamp
+>>>>>>> upstream/daffy
         lanePose.d = d_max
         lanePose.phi = phi_max
         lanePose.in_lane = True

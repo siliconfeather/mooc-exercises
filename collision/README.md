@@ -6,6 +6,7 @@ In this exercise, you will write a collision checker. In the next exercise you w
 Note: This is a code-only exercise: you don't need the Duckiebot.
 
 
+<<<<<<< HEAD
 * [Instructions](#instructions)
 * [Data structures and protocol](#data-structures-and-protocol)
 * [Template](#template)
@@ -21,6 +22,12 @@ Note: This is a code-only exercise: you don't need the Duckiebot.
 
 The template contained in this folder is a fully functional (wrong) solution. 
 You can try to evaluate/submit right away.
+=======
+
+## Instructions
+
+The template contained in this folder is a fully functional (wrong) solution. Currently, the solution submits random guesses as to whether the robot collides with the environment or not. You can try to evaluate right away to see how it works.
+>>>>>>> upstream/daffy
 
 Make sure you have an updated system using
 
@@ -50,6 +57,7 @@ because the test challenge must remain a secret.
 [test]: https://challenges.duckietown.org/v4/humans/challenges/mooc-collision-check-test
 [vali]: https://challenges.duckietown.org/v4/humans/challenges/mooc-collision-check-vali
 
+<<<<<<< HEAD
 Now, go read `collision_checker.py`, which contains the template. There are some hints to get started there. 
 
 Modify the file and test if the program runs or check its performance with local evaluations over the validation dataset. And once satisfied with the program, submit to the challenges.
@@ -247,4 +255,11 @@ Disadvantages:
 
 - There are subtle issues regarding the approximations you are making. What exactly does a pixel represent? is it a point, or is it an area? is this an optimistic or pessimistic approximation? The semantics of painting is unclear. 
 
+=======
+Now, start the jupyter notebook with 
+
+`dts exercises lab` and open the notebook `collision_checker01.ipynb` and have a look at `collision_checker.py`, which contains the template.
+
+Modify the file and test if the program runs or check its performance with local evaluations over the validation dataset. And once satisfied with the program, submit to the challenge.
+>>>>>>> upstream/daffy
 

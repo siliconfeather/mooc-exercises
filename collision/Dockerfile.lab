@@ -1,28 +1,16 @@
-<<<<<<< HEAD
-FROM ${DOCKER_REGISTRY}/duckietown/dt-gui-tools:daffy-amd64
 
-RUN pip3 install -U \
-    duckietown-utils-daffy \
-    matplotlib \
-=======
 ARG DOCKER_REGISTRY=docker.io
 FROM ${DOCKER_REGISTRY}/duckietown/dt-gui-tools:daffy-amd64
 
 RUN /usr/bin/python3 -m pip install --upgrade pip
 
-
 RUN pip3 install -U \
-    duckietown-utils-daffy \
     aido-protocols-daffy \
-    matplotlib==3.6.0 \
-    networkx \
->>>>>>> upstream/daffy
-    ipympl \
-    ipython \
-    duckietown-world-daffy
+    duckietown-world-daffy \
+    tqdm \
+    ipywidgets
 
-<<<<<<< HEAD
-=======
+
 
 RUN apt update && apt install unzip
 
@@ -36,5 +24,4 @@ ENV PYTHONPATH="${PYTHONPATH}:/jupyter_ws/solution/utils"
 # note that this CMD normally gets overwritten
 CMD ["dt-launcher-jupyter"]
 
->>>>>>> upstream/daffy
-CMD ["dt-launcher-jupyter"]
+

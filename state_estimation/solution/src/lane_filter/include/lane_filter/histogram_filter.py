@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+<<<<<<< HEAD
 # In[1]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 # start by importing some things we will need
@@ -13,7 +17,11 @@ from scipy.stats import entropy, multivariate_normal
 from math import floor, sqrt
 
 
+<<<<<<< HEAD
 # In[4]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 # Now let's define the prior function. In this case we choose
@@ -27,18 +35,26 @@ def histogram_prior(belief, grid_spec, mean_0, cov_0):
     return belief
 
 
+<<<<<<< HEAD
 # In[5]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 # Now let's define the predict function
 
 
 def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_spec, robot_spec, cov_mask):
+<<<<<<< HEAD
         
+=======
+>>>>>>> upstream/daffy
         belief_in = belief
         delta_t = dt
         
         # TODO calculate v and w from ticks using kinematics. You will need  some parameters in the `robot_spec` defined above
+<<<<<<< HEAD
         
         #-------
         
@@ -85,32 +101,53 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
         #dt = grid_spec['d'] + v * delta_t * np.sin(grid_spec['phi'])  # replace this with something that adds the new odometry
         phi_t = grid_spec['phi'] + w * delta_t # replace this with something that adds the new odometry
         dt = grid_spec['d'] + v * delta_t * np.sin(phi_t)
+=======
+        v = 0.0 # replace this with a function that uses the encoder 
+        w = 0.0 # replace this with a function that uses the encoder
+        
+        # TODO propagate each centroid forward using the kinematic function
+        d_t = grid_spec['d'] # replace this with something that adds the new odometry
+        phi_t = grid_spec['phi'] # replace this with something that adds the new odometry
+>>>>>>> upstream/daffy
 
         p_belief = np.zeros(belief.shape)
 
         # Accumulate the mass for each cell as a result of the propagation step
+<<<<<<< HEAD
         
         # TODO propagate each centroid forward using the kinematic function
         
+=======
+>>>>>>> upstream/daffy
         for i in range(belief.shape[0]):
             for j in range(belief.shape[1]):
                 # If belief[i,j] there was no mass to move in the first place
                 if belief[i, j] > 0:
                     # Now check that the centroid of the cell wasn't propagated out of the allowable range
                     if (
+<<<<<<< HEAD
                         dt[i, j] > grid_spec['d_max']
                         or dt[i, j] < grid_spec['d_min']
+=======
+                        d_t[i, j] > grid_spec['d_max']
+                        or d_t[i, j] < grid_spec['d_min']
+>>>>>>> upstream/daffy
                         or phi_t[i, j] < grid_spec['phi_min']
                         or phi_t[i, j] > grid_spec['phi_max']
                     ):
                         continue
                     
                     # TODO Now find the cell where the new mass should be added
+<<<<<<< HEAD
                     #i_new = i # replace with something that accounts for the movement of the robot
                     i_new = int(floor((dt[i, j] - grid_spec['d_min']) / grid_spec['delta_d']))
                     
                     #j_new = j # replace with something that accounts for the movement of the robot
                     j_new = int(floor((phi_t[i, j] - grid_spec['phi_min']) / grid_spec['delta_phi']))
+=======
+                    i_new = i # replace with something that accounts for the movement of the robot
+                    j_new = j # replace with something that accounts for the movement of the robot
+>>>>>>> upstream/daffy
 
                     p_belief[i_new, j_new] += belief[i, j]
 
@@ -121,12 +158,19 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
 
         if np.sum(s_belief) == 0:
             return belief_in
+<<<<<<< HEAD
         
+=======
+>>>>>>> upstream/daffy
         belief = s_belief / np.sum(s_belief)
         return belief
 
 
+<<<<<<< HEAD
 # In[6]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 # We will start by doing a little bit of processing on the segments to remove anything that is behing the robot (why would it be behind?)
@@ -147,7 +191,11 @@ def prepare_segments(segments):
     return filtered_segments
 
 
+<<<<<<< HEAD
 # In[7]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 def generate_vote(segment, road_spec):
@@ -187,7 +235,11 @@ def generate_vote(segment, road_spec):
     return d_i, phi_i
 
 
+<<<<<<< HEAD
 # In[8]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 def generate_measurement_likelihood(segments, road_spec, grid_spec):
@@ -203,11 +255,16 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
             continue
 
         # TODO find the cell index that corresponds to the measurement d_i, phi_i
+<<<<<<< HEAD
         #i = 1 # replace this
         i = int(floor((d_i - grid_spec['d_min']) / grid_spec['delta_d']))
         
         #j = 1 # replace this
         j = int(floor((phi_i - grid_spec['phi_min']) / grid_spec['delta_phi']))
+=======
+        i = 1 # replace this
+        j = 1 # replace this
+>>>>>>> upstream/daffy
         
         # Add one vote to that cell
         measurement_likelihood[i, j] += 1
@@ -218,7 +275,11 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
     return measurement_likelihood
 
 
+<<<<<<< HEAD
 # In[9]:
+=======
+# In[ ]:
+>>>>>>> upstream/daffy
 
 
 def histogram_update(belief, segments, road_spec, grid_spec):
@@ -231,6 +292,7 @@ def histogram_update(belief, segments, road_spec, grid_spec):
     if measurement_likelihood is not None:
         # TODO: combine the prior belief and the measurement likelihood to get the posterior belief
         # Don't forget that you may need to normalize to ensure that the output is valid probability distribution
+<<<<<<< HEAD
         
         belief = np.multiply(belief, measurement_likelihood) # replace this with something that combines the belief and the measurement_likelihood            
         if np.sum(belief) == 0:
@@ -238,5 +300,8 @@ def histogram_update(belief, segments, road_spec, grid_spec):
         else:    
             belief = belief / np.sum(belief)
                              
+=======
+        belief = measurement_likelihood # replace this with something that combines the belief and the measurement_likelihood
+>>>>>>> upstream/daffy
     return (measurement_likelihood, belief)
 
